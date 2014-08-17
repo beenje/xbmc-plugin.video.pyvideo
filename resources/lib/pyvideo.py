@@ -18,12 +18,7 @@
 
 import bs4
 import re
-try:
-    # We want to import script.module.requests2
-    import requests2 as requests
-except ImportError:
-    # Allows to run the script in cli
-    import requests
+import requests
 import urlparse
 from config import plugin
 

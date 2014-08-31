@@ -28,6 +28,7 @@ CATEGORY_URL = ROOT_URL + '/category'
 SEARCH_URL = ROOT_URL + '/search'
 API_URL = ROOT_URL + '/api/v2/'
 API_VIDEO_URL = API_URL + 'video/'
+API_CATEGORY_URL = API_URL + 'category/'
 VIDEO_ID_RE = re.compile('/video/(\d+)/')
 FORMATS = ['ogv', 'webm', 'mp4', 'flv']
 ADDONS = {
@@ -78,31 +79,21 @@ def get_videos_from_page(soup):
 
 def get_categories():
     """Return the list of categories"""
-    soup = get_soup(CATEGORY_URL)
-    rows = soup.find_all('tr')
-    categories = []
-    conf = ''
-    # We look at the first column of the table
-    # If there is no link, it's the conference title.
-    # The following rows are the years.
-    for row in rows:
-        link = row.td.a
-        if link is None:
-            conf = row.td.text
-        else:
-            title = link.text
-            if title.isdigit():
-                title = ' '.join([conf, title])
-            categories.append(
-                    {'title': title,
-                     'url': link.get('href')})
+    results = get_json(API_CATEGORY_URL).get('results', [])
+    categories = [{'title': result['title'],
+                   'slug': result['slug']} for result in results]
     return categories
 
 
-def get_category_videos(url):
-    """Return the list of videos found for the given category url"""
-    soup = get_soup(ROOT_URL + url)
-    return get_videos_from_page(soup)
+def get_category_videos(slug, page):
+    """Return the list of videos found for the given category slug"""
+    items = get_json(API_VIDEO_URL + '/?category=' + slug + '&page=' + page)
+    results = items.get('results', [])
+    videos = [{'title': result['title'],
+               'id': result['id'],
+               'thumbnail': result.get('thumbnail_url'),
+               'summary': result['summary']} for result in results]
+    return (videos, items['next'])
 
 
 def get_latest():

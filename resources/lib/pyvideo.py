@@ -90,7 +90,8 @@ def get_videos_from_json(items):
     return [{'title': result['title'],
              'id': result['id'],
              'thumbnail': result.get('thumbnail_url'),
-             'summary': result['summary']} for result in items.get('results', [])]
+             'description': result.get('description', ''),
+             'summary': result.get('summary', '')} for result in items.get('results', [])]
 
 
 def get_category_videos(slug, page):

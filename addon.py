@@ -92,6 +92,9 @@ def list_videos(videos):
         {'label': item['title'],
          'path': plugin.url_for('play_video', video_id=item['id']),
          'thumbnail': item.get('thumbnail'),
+         'info': {
+             'plot':  item.get('summary', '') or item.get('description', ''),
+         },
          'is_playable': True,
          } for item in videos]
     return items

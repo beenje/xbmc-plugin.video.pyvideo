@@ -85,26 +85,25 @@ def get_categories():
     return categories
 
 
+def get_videos_from_json(items):
+    """Return the videos from the json response"""
+    return [{'title': result['title'],
+             'id': result['id'],
+             'thumbnail': result.get('thumbnail_url'),
+             'summary': result['summary']} for result in items.get('results', [])]
+
+
 def get_category_videos(slug, page):
     """Return the list of videos found for the given category slug"""
     items = get_json(API_VIDEO_URL + '/?category=' + slug + '&page=' + page)
-    results = items.get('results', [])
-    videos = [{'title': result['title'],
-               'id': result['id'],
-               'thumbnail': result.get('thumbnail_url'),
-               'summary': result['summary']} for result in results]
+    videos = get_videos_from_json(items)
     return (videos, items['next'])
 
 
 def get_latest():
     """Return the latest videos"""
     items = get_json(API_VIDEO_URL + '/?ordering=-added')
-    results = items.get('results', [])
-    videos = [{'title': result['title'],
-               'id': result['id'],
-               'thumbnail': result.get('thumbnail_url'),
-               'summary': result['summary']} for result in results]
-    return videos
+    return get_videos_from_json(items)
 
 
 def search(text):

@@ -97,11 +97,14 @@ def get_category_videos(slug, page):
 
 
 def get_latest():
-    """Return the latest videos displayed on the front page"""
-    soup = get_soup(ROOT_URL)
-    return [{'title': link.text,
-             'id': get_video_id(link.get('href')),
-             } for link in soup.select('ul a[href^=/video]')]
+    """Return the latest videos"""
+    items = get_json(API_VIDEO_URL + '/?ordering=-added')
+    results = items.get('results', [])
+    videos = [{'title': result['title'],
+               'id': result['id'],
+               'thumbnail': result.get('thumbnail_url'),
+               'summary': result['summary']} for result in results]
+    return videos
 
 
 def search(text):

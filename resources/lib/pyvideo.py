@@ -138,6 +138,17 @@ def get_vimeo_id(url):
     return None
 
 
+def exists(url):
+    """Send a HEAD request to check if the url exists"""
+    try:
+        r = requests.head(url)
+    except:
+        return False
+    plugin.log.debug('HEAD request status: {0}'.format(
+        r.status_code))
+    return r.status_code in (200, 301, 302, 307)
+
+
 def resolve_url(video):
     """Return a playbable url from the video json metadata"""
     # We first check if there is a file available
@@ -147,7 +158,11 @@ def resolve_url(video):
         if video[attribute]:
             plugin.log.debug('found {0} format {1}'.format(
                 fmt, video[attribute]))
-            return video[attribute]
+            if exists(video[attribute]):
+                return video[attribute]
+            else:
+                plugin.log.debug("{0} doesn't seem to exist".format(
+                    video[attribute]))
     # We fallback to the source url.
     src_url = video['source_url']
     for service, addon in ADDONS.items():
